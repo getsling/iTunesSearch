@@ -18,6 +18,7 @@ A library for communicating with the iTunes store.
 } failureHandler:^(NSError *error) {
     NSLog(@"error: %@", error);
 }];
+```
 
 See the included iOS project for examples.
 

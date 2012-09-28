@@ -3,7 +3,7 @@
 //  lastfmlocalplayback
 //
 //  Created by Piers Biddlestone on 28/09/12.
-//  Copyright (c) 2012 Last.fm. All rights reserved.
+//  Copyright (c) 2012 Gangverk. All rights reserved.
 //
 
 #import "ItunesSearch.h"
