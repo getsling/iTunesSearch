@@ -1,9 +1,9 @@
 //
 //  ItunesSearch.h
-//  lastfmlocalplayback
+//  iTunesSearch
 //
 //  Created by Piers Biddlestone on 28/09/12.
-//  Copyright (c) 2012 Last.fm. All rights reserved.
+//  Copyright (c) 2012 Gabgverk. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

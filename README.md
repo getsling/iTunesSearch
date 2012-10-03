@@ -28,7 +28,7 @@ You can install iTunesSearch with [CocoaPods](http://cocoapods.org). You can als
 
 ### Requirements
 * iTunesSearch is built using ARC and modern Objective-C syntax. You will need Xcode 4.4 or higher to use it in your project.
-
+* iTunesSearch uses NSJSONSerialization and thus needs iOS 5 or higher.
 
 ## Issues and questions
 Have a bug? Please [create an issue on GitHub](https://github.com/gangverk/iTunesSearch/issues)!
