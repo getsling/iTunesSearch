@@ -192,6 +192,26 @@
     [self.queue addOperation:op];
 }
 
+#pragma mark - Album methods
+
+- (void)getTracksForAlbums:(NSArray *)albumIds limitOrNil:(NSNumber *)limit sucessHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+    // Set up the request parameters
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    [params setObject:[albumIds componentsJoinedByString:@","] forKey:@"id"];
+    [params setObject:@"song" forKey:@"entity"];
+    
+    // Add the limit if supplied
+    if (limit && limit > 0) {
+        [params setObject:limit forKey:@"limit"];
+    }
+    
+    [self performApiCallForMethod:@"lookup"
+                       withParams:params
+                       andFilters:nil
+                   successHandler:successHandler
+                   failureHandler:failureHandler];
+}
+
 #pragma mark - Artist methods
 
 - (void)getAlbumsForArtist:(NSNumber *)artistId limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
