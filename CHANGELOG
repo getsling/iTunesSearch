@@ -1,2 +1,9 @@
+0.0.3 - October 31, 2012
+- Fixed getIdForArtist such that it handles a nil artist name.
+- Fixed integer comparison of the limit parameter in various methods.
+
+0.0.2 - October 24, 2012
+- Added a new method for retrieving multiple albums and their tracks.
+
 0.0.1 - October 1, 2012
 - First public release on CocoaPods.

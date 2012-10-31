@@ -228,7 +228,7 @@
     };
     
     // Add the limit if supplied
-    if (limit && limit > 0) {
+    if (limit && [limit integerValue] > 0) {
         [params setObject:limit forKey:@"limit"];
     }
     
@@ -255,7 +255,7 @@
     };
     
     // Add the limit if supplied
-    if (limit && limit > 0) {
+    if (limit && [limit integerValue] > 0) {
         [params setObject:limit forKey:@"limit"];
     }
     
@@ -276,7 +276,7 @@
     
     // Set up the results filter
     NSDictionary *filters = @{
-        @"artistName": artist
+        @"artistName": [self forceString:artist]
     };
     
     [self performApiCallForMethod:@"search"
