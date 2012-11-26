@@ -7,6 +7,7 @@
 //
 
 #import "ItunesSearch.h"
+#include <CommonCrypto/CommonDigest.h>
 
 #define API_URL @"http://itunes.apple.com/"
 
@@ -31,11 +32,23 @@
         self.partnerId = @"";
         self.tradeDoublerId = @"";
         self.queue = [[NSOperationQueue alloc] init];
+        self.timeoutInterval = 10;
+        self.maxCacheAge = (60 * 60 * 24);
     }
     return self;
 }
 
 #pragma mark - Private methods
+
+- (NSString *)md5sumFromString:(NSString *)string {
+	unsigned char digest[CC_MD5_DIGEST_LENGTH], i;
+	CC_MD5([string UTF8String], [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding], digest);
+	NSMutableString *ms = [NSMutableString string];
+	for (i=0;i<CC_MD5_DIGEST_LENGTH;i++) {
+		[ms appendFormat: @"%02x", (int)(digest[i])];
+	}
+	return [ms copy];
+}
 
 - (NSString*)urlEscapeString:(id)unencodedString {
     if ([unencodedString isKindOfClass:[NSString class]]) {
@@ -58,33 +71,83 @@
                  successHandler:(ItunesSearchReturnBlockWithObject)successHandler
                  failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
 
+    [self performApiCallForMethod:method
+                         useCache:YES
+                       withParams:params
+                       andFilters:filters
+                   successHandler:successHandler
+                   failureHandler:failureHandler];
+}
+
+- (void)performApiCallForMethod:(NSString*)method
+                       useCache:(BOOL)useCache
+                     withParams:(NSDictionary *)params
+                     andFilters:(NSDictionary *)filters
+                 successHandler:(ItunesSearchReturnBlockWithObject)successHandler
+                 failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+
+    NSMutableDictionary *newParams = [params mutableCopy];
+    [newParams setObject:method forKey:@"method"];
+
+    // Add affiliate identifiers if supplied
+    if (self.partnerId && self.partnerId.length > 0)
+        [newParams setObject:self.partnerId forKey:@"partnerId"];
+    if (self.tradeDoublerId && self.tradeDoublerId.length > 0)
+        [newParams setObject:self.tradeDoublerId forKey:@"tduid"];
+
+    // Set the user's country to get the correct price
+    [newParams setObject:[[NSLocale currentLocale] objectForKey: NSLocaleCountryCode]
+                  forKey:@"country"];
+
+    // Convert the dict of params into an array of key=value strings
+    NSMutableArray *paramsArray = [NSMutableArray arrayWithCapacity:[newParams count]];
+    [newParams enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        [paramsArray addObject:[NSString stringWithFormat:@"%@=%@", [self urlEscapeString:key], [self urlEscapeString:obj]]];
+    }];
+
+    // Construct the request url
+    NSString *url = [NSString stringWithFormat:@"%@%@?%@", API_URL, method, [paramsArray componentsJoinedByString:@"&"]];
+
+    // Check if we have the object in cache
+    NSString *cacheKey = [self md5sumFromString:url];
+    if (useCache && self.cacheDelegate && [self.cacheDelegate respondsToSelector:@selector(cachedArrayForKey:)]) {
+        NSArray *cachedArray = [self.cacheDelegate cachedArrayForKey:cacheKey];
+        if (cachedArray && cachedArray.count) {
+            if (successHandler) {
+                successHandler(cachedArray);
+            }
+        }
+    }
+
+    [self _performApiCallWithURL:url
+                        useCache:useCache
+                       signature:cacheKey
+                      withParams:params
+                      andFilters:filters
+                  successHandler:successHandler
+                  failureHandler:failureHandler];
+}
+
+- (void)_performApiCallWithURL:(NSString*)url
+                      useCache:(BOOL)useCache
+                     signature:(NSString *)cacheKey
+                    withParams:(NSDictionary *)params
+                    andFilters:(NSDictionary *)filters
+                successHandler:(ItunesSearchReturnBlockWithObject)successHandler
+                failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
     NSBlockOperation *op = [[NSBlockOperation alloc] init];
     [op addExecutionBlock:^{
-        // Add the short link affiliation token
-        NSMutableDictionary *newParams = [params mutableCopy];
-        
-        // Add affiliate identifiers if supplied
-        if (self.partnerId && self.partnerId.length > 0)
-            [newParams setObject:self.partnerId forKey:@"partnerId"];
-        if (self.tradeDoublerId && self.tradeDoublerId.length > 0)
-            [newParams setObject:self.tradeDoublerId forKey:@"tduid"];
-
-        // Set the user's country to get the correct price
-        [newParams setObject:[[NSLocale currentLocale] objectForKey: NSLocaleCountryCode]
-                      forKey:@"country"];
-
-        // Convert the dict of params into an array of key=value strings
-        NSMutableArray *paramsArray = [NSMutableArray arrayWithCapacity:[newParams count]];
-        [newParams enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-            [paramsArray addObject:[NSString stringWithFormat:@"%@=%@", [self urlEscapeString:key], [self urlEscapeString:obj]]];
-        }];
-
         // Set up the http request
-        NSString *url = [NSString stringWithFormat:@"%@%@?%@", API_URL, method, [paramsArray componentsJoinedByString:@"&"]];
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+        NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
+        if (!useCache) {
+            policy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
+        }
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]
+                                                               cachePolicy:policy
+                                                           timeoutInterval:self.timeoutInterval];
         [request setHTTPMethod:@"GET"];
-        
-        NSURLResponse *response;
+
+        NSHTTPURLResponse *response;
         NSError *error;
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 
@@ -97,12 +160,12 @@
             }
             return;
         }
-        
+
         // Deserialise the raw data into a JSON object
         id jsonData = [NSJSONSerialization JSONObjectWithData:data
                                                       options:0
                                                         error:&error];
-        
+
         // Check for data serialization errors
         if (error) {
             if (failureHandler) {
@@ -112,7 +175,7 @@
             }
             return;
         }
-        
+
         // Ensure the JSON is valid
         if (![NSJSONSerialization isValidJSONObject:jsonData]) {
             if (failureHandler) {
@@ -124,14 +187,14 @@
                     NSError *invalidJSONError = [NSError errorWithDomain:@"ItunesSearch"
                                                                     code:100
                                                                 userInfo:details];
-                    
+
                     // Execute the failure handler
                     failureHandler(invalidJSONError);
                 }];
             }
             return;
         }
-        
+
         // Ensure a dictionary was received
         if (![jsonData isKindOfClass:[NSDictionary class]]) {
             if (failureHandler) {
@@ -143,21 +206,21 @@
                     NSError *invalidTopLevel = [NSError errorWithDomain:@"ItunesSearch"
                                                                    code:101
                                                                userInfo:details];
-                    
+
                     // Execute the failure handler
                     failureHandler(invalidTopLevel);
                 }];
             }
-            
+
             return;
         }
-        
+
         // Extract the results from the returned data
         NSArray *filteredResults = nil;
         if (jsonData && [jsonData count] > 0) {
             // Pull out the results object
             NSArray *results = [jsonData objectForKey:@"results"];
-            
+
             // Sanity check the results
             if (results) {
                 // Apply filters to the results if supplied
@@ -170,7 +233,7 @@
                                                key,
                                                [filters valueForKey:key]]];
                     }
-                    
+
                     // Apply the predicates
                     filteredResults = [results filteredArrayUsingPredicate:
                                        [NSCompoundPredicate andPredicateWithSubpredicates:predicates]];
@@ -180,7 +243,14 @@
                 }
             }
         }
-        
+
+        // Add to cache
+        if (useCache &&
+            self.cacheDelegate &&
+            [self.cacheDelegate respondsToSelector:@selector(cacheArray:forKey:maxAge:)]) {
+            [self.cacheDelegate cacheArray:filteredResults forKey:cacheKey maxAge:self.maxCacheAge];
+        }
+
         // Send the results to the success handler
         if (successHandler) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -188,7 +258,7 @@
             }];
         }
     }];
-    
+
     [self.queue addOperation:op];
 }
 
@@ -199,12 +269,12 @@
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
     [params setObject:[albumIds componentsJoinedByString:@","] forKey:@"id"];
     [params setObject:@"song" forKey:@"entity"];
-    
+
     // Add the limit if supplied
     if (limit && limit > 0) {
         [params setObject:limit forKey:@"limit"];
     }
-    
+
     [self performApiCallForMethod:@"lookup"
                        withParams:params
                        andFilters:nil
@@ -220,21 +290,21 @@
     [params setObject:[self forceString:[artistId stringValue]] forKey:@"id"];
     [params setObject:@"music" forKey:@"media"];
     [params setObject:@"album" forKey:@"entity"];
-    
+
     // Set up the results filter
     NSDictionary *filters = @{
-        @"wrapperType": @"collection",
-        @"collectionType": @"album"
+    @"wrapperType": @"collection",
+    @"collectionType": @"album"
     };
-    
+
     // Add the limit if supplied
     if (limit && [limit integerValue] > 0) {
         [params setObject:limit forKey:@"limit"];
     }
-    
+
     [self performApiCallForMethod:@"lookup"
                        withParams:params
-                          andFilters:filters
+                       andFilters:filters
                    successHandler:successHandler
                    failureHandler:failureHandler];
 }
@@ -246,19 +316,19 @@
     [params setObject:@"music" forKey:@"media"];
     [params setObject:@"album" forKey:@"entity"];
     [params setObject:@"artistTerm" forKey:@"attribute"];
-     
+
     // Set up the results filter
     NSDictionary *filters = @{
-        @"wrapperType": @"collection",
-        @"collectionType": @"album",
-        @"collectionName": albumName
+    @"wrapperType": @"collection",
+    @"collectionType": @"album",
+    @"collectionName": albumName
     };
-    
+
     // Add the limit if supplied
     if (limit && [limit integerValue] > 0) {
         [params setObject:limit forKey:@"limit"];
     }
-    
+
     [self performApiCallForMethod:@"search"
                        withParams:params
                        andFilters:filters
@@ -273,12 +343,12 @@
     [params setObject:@"music" forKey:@"media"];
     [params setObject:@"musicArtist" forKey:@"entity"];
     [params setObject:@"artistTerm" forKey:@"attribute"];
-    
+
     // Set up the results filter
     NSDictionary *filters = @{
-        @"artistName": [self forceString:artist]
+    @"artistName": [self forceString:artist]
     };
-    
+
     [self performApiCallForMethod:@"search"
                        withParams:params
                        andFilters:filters

@@ -12,13 +12,23 @@ typedef void (^ItunesSearchReturnBlockWithObject)(id result);
 typedef void (^ItunesSearchReturnBlockWithArray)(NSArray *result);
 typedef void (^ItunesSearchReturnBlockWithError)(NSError *error);
 
+@protocol ItunesSearchCache <NSObject>
+@optional
+- (NSArray *)cachedArrayForKey:(NSString *)key;
+- (void)cacheArray:(NSArray *)array forKey:(NSString *)key maxAge:(NSTimeInterval)maxAge;
+@end
+
 @interface ItunesSearch : NSObject
 
 @property (strong, nonatomic) NSString *partnerId;
 @property (strong, nonatomic) NSString *tradeDoublerId;
+@property (unsafe_unretained, nonatomic) id <ItunesSearchCache> cacheDelegate;
+@property (nonatomic) NSTimeInterval timeoutInterval;   // default: 10
+@property (nonatomic) NSTimeInterval maxCacheAge;       // default: 60*60*24
 
 + (ItunesSearch *)sharedInstance;
 - (void)performApiCallForMethod:(NSString*)method withParams:(NSDictionary *)params andFilters:(NSDictionary *)filters successHandler:(ItunesSearchReturnBlockWithObject)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
+- (void)performApiCallForMethod:(NSString*)method useCache:(BOOL)useCache withParams:(NSDictionary *)params andFilters:(NSDictionary *)filters successHandler:(ItunesSearchReturnBlockWithObject)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
 
 #pragma mark - Album methods
 
