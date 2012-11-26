@@ -85,9 +85,7 @@
                      andFilters:(NSDictionary *)filters
                  successHandler:(ItunesSearchReturnBlockWithObject)successHandler
                  failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
-
     NSMutableDictionary *newParams = [params mutableCopy];
-    [newParams setObject:method forKey:@"method"];
 
     // Add affiliate identifiers if supplied
     if (self.partnerId && self.partnerId.length > 0)
@@ -116,6 +114,7 @@
             if (successHandler) {
                 successHandler(cachedArray);
             }
+            return;
         }
     }
 

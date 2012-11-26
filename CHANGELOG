@@ -1,3 +1,7 @@
+0.1.1 - November 26, 2012
+- Fixed caching support to ensure remote calls are not made if a cached
+  item is found.
+
 0.1.0 - November 26, 2012
 - Added caching delegate
 
