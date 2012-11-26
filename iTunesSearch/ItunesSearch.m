@@ -122,7 +122,7 @@
     [self _performApiCallWithURL:url
                         useCache:useCache
                        signature:cacheKey
-                      withParams:params
+                      withParams:newParams
                       andFilters:filters
                   successHandler:successHandler
                   failureHandler:failureHandler];
@@ -247,8 +247,8 @@
         // Add to cache
         if (useCache &&
             self.cacheDelegate &&
-            [self.cacheDelegate respondsToSelector:@selector(cacheArray:forKey:maxAge:)]) {
-            [self.cacheDelegate cacheArray:filteredResults forKey:cacheKey maxAge:self.maxCacheAge];
+            [self.cacheDelegate respondsToSelector:@selector(cacheArray:forKey:requestParams:maxAge:)]) {
+            [self.cacheDelegate cacheArray:filteredResults forKey:cacheKey requestParams:params maxAge:self.maxCacheAge];
         }
 
         // Send the results to the success handler

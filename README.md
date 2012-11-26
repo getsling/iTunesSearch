@@ -5,6 +5,7 @@ A library for communicating with the iTunes store.
 ### Features
 - Block based for easier usage
 - No dependencies
+- Result caching
 
 ## Usage
 ```objective-c

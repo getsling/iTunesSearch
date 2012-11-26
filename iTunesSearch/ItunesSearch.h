@@ -15,7 +15,7 @@ typedef void (^ItunesSearchReturnBlockWithError)(NSError *error);
 @protocol ItunesSearchCache <NSObject>
 @optional
 - (NSArray *)cachedArrayForKey:(NSString *)key;
-- (void)cacheArray:(NSArray *)array forKey:(NSString *)key maxAge:(NSTimeInterval)maxAge;
+- (void)cacheArray:(NSArray *)array forKey:(NSString *)key requestParams:(NSDictionary *)params maxAge:(NSTimeInterval)maxAge;
 @end
 
 @interface ItunesSearch : NSObject

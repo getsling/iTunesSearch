@@ -1,3 +1,6 @@
+0.1.0 - November 26, 2012
+- Added caching delegate
+
 0.0.3 - October 31, 2012
 - Fixed getIdForArtist such that it handles a nil artist name.
 - Fixed integer comparison of the limit parameter in various methods.
