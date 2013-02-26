@@ -40,4 +40,8 @@ typedef void (^ItunesSearchReturnBlockWithError)(NSError *error);
 - (void)getAlbumWithArtist:(NSString *)artistName andName:(NSString *)albumName limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
 - (void)getIdForArtist:(NSString *)artist successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
 
+#pragma mark - Track methods
+
+- (void)getTrackWithName:(NSString *)trackName artist:(NSString *)artist album:(NSString *)album limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
+
 @end

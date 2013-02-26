@@ -9,7 +9,7 @@
 #import "ItunesSearch.h"
 #include <CommonCrypto/CommonDigest.h>
 
-#define API_URL @"http://itunes.apple.com/"
+#define API_URL @"https://itunes.apple.com/"
 
 @interface ItunesSearch ()
 @property (nonatomic, strong) NSOperationQueue *queue;
@@ -175,25 +175,6 @@
             return;
         }
 
-        // Ensure the JSON is valid
-        if (![NSJSONSerialization isValidJSONObject:jsonData]) {
-            if (failureHandler) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    // Build an error describing the failure
-                    NSMutableDictionary* details = [NSMutableDictionary dictionary];
-                    [details setValue:@"Invalid JSON returned"
-                               forKey:NSLocalizedDescriptionKey];
-                    NSError *invalidJSONError = [NSError errorWithDomain:@"ItunesSearch"
-                                                                    code:100
-                                                                userInfo:details];
-
-                    // Execute the failure handler
-                    failureHandler(invalidJSONError);
-                }];
-            }
-            return;
-        }
-
         // Ensure a dictionary was received
         if (![jsonData isKindOfClass:[NSDictionary class]]) {
             if (failureHandler) {
@@ -292,8 +273,8 @@
 
     // Set up the results filter
     NSDictionary *filters = @{
-    @"wrapperType": @"collection",
-    @"collectionType": @"album"
+        @"wrapperType": @"collection",
+        @"collectionType": @"album"
     };
 
     // Add the limit if supplied
@@ -318,9 +299,9 @@
 
     // Set up the results filter
     NSDictionary *filters = @{
-    @"wrapperType": @"collection",
-    @"collectionType": @"album",
-    @"collectionName": albumName
+        @"wrapperType": @"collection",
+        @"collectionType": @"album",
+        @"collectionName": albumName
     };
 
     // Add the limit if supplied
@@ -344,15 +325,57 @@
     [params setObject:@"artistTerm" forKey:@"attribute"];
 
     // Set up the results filter
-    NSDictionary *filters = @{
-    @"artistName": [self forceString:artist]
-    };
+    NSDictionary *filters = @{ @"artistName": [self forceString:artist] };
 
     [self performApiCallForMethod:@"search"
                        withParams:params
                        andFilters:filters
                    successHandler:successHandler
                    failureHandler:failureHandler];
+}
+
+#pragma mark - Track methods
+
+- (void)getTrackWithName:(NSString *)trackName artist:(NSString *)artist album:(NSString *)album limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+    // Ensure only valid objects are used in the search
+    NSMutableArray *searchParameters = [NSMutableArray array];
+    if (trackName) {
+        [searchParameters addObject:trackName];
+    }
+
+    if (artist) {
+        [searchParameters addObject:artist];
+    }
+
+    if (album) {
+        [searchParameters addObject:album];
+    }
+
+    // Build the search term
+    NSString *searchTerm = [searchParameters componentsJoinedByString:@"+"];
+
+    if (searchTerm && [searchTerm length] > 0) {
+        // Set up the request paramters
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        [params setObject:[self forceString:searchTerm] forKey:@"term"];
+        [params setObject:@"music" forKey:@"media"];
+        [params setObject:@"song" forKey:@"entity"];
+
+        // Add the limit if supplied
+        if (limit && limit > 0) {
+            [params setObject:limit forKey:@"limit"];
+        }
+
+        [self performApiCallForMethod:@"search"
+                           withParams:params
+                           andFilters:nil
+                       successHandler:successHandler
+                       failureHandler:failureHandler];
+    } else {
+        if (successHandler) {
+            return successHandler(nil);
+        }
+    }
 }
 
 @end
