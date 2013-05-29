@@ -1,13 +1,16 @@
+0.1.3 - February 26, 2013
+- Moved to modern Objective-c syntax for cleaner code.
+- Fixed crash if no NSLocaleCountryCode was found.
+
 0.1.2 - February 26, 2013
 - Added new method for retrieving a single track.
 - Removed unecessary validation.
 
 0.1.1 - November 26, 2012
-- Fixed caching support to ensure remote calls are not made if a cached
-  item is found.
+- Fixed caching support to ensure remote calls are not made if a cached item is found.
 
 0.1.0 - November 26, 2012
-- Added caching delegate
+- Added caching delegate.
 
 0.0.3 - October 31, 2012
 - Fixed getIdForArtist such that it handles a nil artist name.

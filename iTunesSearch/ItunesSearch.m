@@ -85,17 +85,20 @@
                      andFilters:(NSDictionary *)filters
                  successHandler:(ItunesSearchReturnBlockWithObject)successHandler
                  failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+
     NSMutableDictionary *newParams = [params mutableCopy];
 
     // Add affiliate identifiers if supplied
     if (self.partnerId && self.partnerId.length > 0)
-        [newParams setObject:self.partnerId forKey:@"partnerId"];
+        newParams[@"partnerId"] = self.partnerId;
     if (self.tradeDoublerId && self.tradeDoublerId.length > 0)
-        [newParams setObject:self.tradeDoublerId forKey:@"tduid"];
+        newParams[@"tduid"] = self.tradeDoublerId;
 
     // Set the user's country to get the correct price
-    [newParams setObject:[[NSLocale currentLocale] objectForKey: NSLocaleCountryCode]
-                  forKey:@"country"];
+    NSString *country = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
+    if (country && country.length) {
+        newParams[@"country"] = country;
+    }
 
     // Convert the dict of params into an array of key=value strings
     NSMutableArray *paramsArray = [NSMutableArray arrayWithCapacity:[newParams count]];
@@ -134,6 +137,7 @@
                     andFilters:(NSDictionary *)filters
                 successHandler:(ItunesSearchReturnBlockWithObject)successHandler
                 failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+
     NSBlockOperation *op = [[NSBlockOperation alloc] init];
     [op addExecutionBlock:^{
         // Set up the http request
@@ -199,7 +203,7 @@
         NSArray *filteredResults = nil;
         if (jsonData && [jsonData count] > 0) {
             // Pull out the results object
-            NSArray *results = [jsonData objectForKey:@"results"];
+            NSArray *results = jsonData[@"results"];
 
             // Sanity check the results
             if (results) {
@@ -247,12 +251,12 @@
 - (void)getTracksForAlbums:(NSArray *)albumIds limitOrNil:(NSNumber *)limit sucessHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
     // Set up the request parameters
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-    [params setObject:[albumIds componentsJoinedByString:@","] forKey:@"id"];
-    [params setObject:@"song" forKey:@"entity"];
+    params[@"id"] = [albumIds componentsJoinedByString:@","];
+    params[@"entity"] = @"song";
 
     // Add the limit if supplied
     if (limit && limit > 0) {
-        [params setObject:limit forKey:@"limit"];
+        params[@"limit"] = limit;
     }
 
     [self performApiCallForMethod:@"lookup"
@@ -267,9 +271,9 @@
 - (void)getAlbumsForArtist:(NSNumber *)artistId limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
     // Set up the request paramters
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-    [params setObject:[self forceString:[artistId stringValue]] forKey:@"id"];
-    [params setObject:@"music" forKey:@"media"];
-    [params setObject:@"album" forKey:@"entity"];
+    params[@"id"] = [self forceString:[artistId stringValue]];
+    params[@"media"] = @"music";
+    params[@"entity"] = @"album";
 
     // Set up the results filter
     NSDictionary *filters = @{
@@ -279,7 +283,7 @@
 
     // Add the limit if supplied
     if (limit && [limit integerValue] > 0) {
-        [params setObject:limit forKey:@"limit"];
+        params[@"limit"] = limit;
     }
 
     [self performApiCallForMethod:@"lookup"
@@ -292,10 +296,10 @@
 - (void)getAlbumWithArtist:(NSString *)artistName andName:(NSString *)albumName limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
     // Set up the request paramters
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-    [params setObject:[self forceString:artistName] forKey:@"term"];
-    [params setObject:@"music" forKey:@"media"];
-    [params setObject:@"album" forKey:@"entity"];
-    [params setObject:@"artistTerm" forKey:@"attribute"];
+    params[@"term"] = [self forceString:artistName];
+    params[@"media"] = @"music";
+    params[@"entity"] = @"album";
+    params[@"attribute"] = @"artistTerm";
 
     // Set up the results filter
     NSDictionary *filters = @{
@@ -306,7 +310,7 @@
 
     // Add the limit if supplied
     if (limit && [limit integerValue] > 0) {
-        [params setObject:limit forKey:@"limit"];
+        params[@"limit"] = limit;
     }
 
     [self performApiCallForMethod:@"search"
@@ -318,11 +322,12 @@
 
 - (void)getIdForArtist:(NSString *)artist successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
     // Set up the request paramters
-    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-    [params setObject:[self forceString:artist] forKey:@"term"];
-    [params setObject:@"music" forKey:@"media"];
-    [params setObject:@"musicArtist" forKey:@"entity"];
-    [params setObject:@"artistTerm" forKey:@"attribute"];
+    NSDictionary *params = @{
+        @"term": [self forceString:artist],
+        @"media": @"music",
+        @"entity": @"musicArtist",
+        @"attribute": @"artistTerm",
+    };
 
     // Set up the results filter
     NSDictionary *filters = @{ @"artistName": [self forceString:artist] };
@@ -357,13 +362,13 @@
     if (searchTerm && [searchTerm length] > 0) {
         // Set up the request paramters
         NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-        [params setObject:[self forceString:searchTerm] forKey:@"term"];
-        [params setObject:@"music" forKey:@"media"];
-        [params setObject:@"song" forKey:@"entity"];
+        params[@"term"] = [self forceString:searchTerm];
+        params[@"media"] = @"music";
+        params[@"entity"] = @"song";
 
         // Add the limit if supplied
         if (limit && limit > 0) {
-            [params setObject:limit forKey:@"limit"];
+            params[@"limit"] = limit;
         }
 
         [self performApiCallForMethod:@"search"
