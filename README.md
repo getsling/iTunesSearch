@@ -1,5 +1,8 @@
 # iTunesSearch - block based iTunes store communication for iOS and Mac OS X
 
+[![Badge w/ Version](https://cocoapod-badges.herokuapp.com/v/iTunesSearch/badge.png)](http://cocoadocs.org/docsets/iTunesSearch)
+[![Badge w/ Platform](https://cocoapod-badges.herokuapp.com/p/iTunesSearch/badge.svg)](http://cocoadocs.org/docsets/iTunesSearch)
+
 A library for communicating with the iTunes store.
 
 ### Features
