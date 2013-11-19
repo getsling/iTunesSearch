@@ -65,6 +65,11 @@
     return value;
 }
 
+- (NSString *)countryCode {
+    if (!_countryCode) _countryCode = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
+    return _countryCode;
+}
+
 - (void)performApiCallForMethod:(NSString*)method
                      withParams:(NSDictionary *)params
                      andFilters:(NSDictionary *)filters
@@ -95,9 +100,8 @@
         newParams[@"tduid"] = self.tradeDoublerId;
 
     // Set the user's country to get the correct price
-    NSString *country = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
-    if (country && country.length) {
-        newParams[@"country"] = country;
+    if (self.countryCode && self.countryCode.length) {
+        newParams[@"country"] = self.countryCode;
     }
 
     // Convert the dict of params into an array of key=value strings

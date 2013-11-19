@@ -22,6 +22,7 @@ typedef void (^ItunesSearchReturnBlockWithError)(NSError *error);
 
 @property (strong, nonatomic) NSString *partnerId;
 @property (strong, nonatomic) NSString *tradeDoublerId;
+@property (strong, nonatomic) NSString *countryCode;    // default: NSLocaleCountryCode
 @property (unsafe_unretained, nonatomic) id <ItunesSearchCache> cacheDelegate;
 @property (nonatomic) NSTimeInterval timeoutInterval;   // default: 10
 @property (nonatomic) NSTimeInterval maxCacheAge;       // default: 60*60*24
