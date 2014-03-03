@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "iTunesSearch"
-  s.version      = "0.1.4"
+  s.version      = "0.1.5"
   s.summary      = "Block based iTunes store communication for iOS and Mac OS X."
   s.homepage     = "https://github.com/gangverk/iTunesSearch"
   s.license      = 'MIT'

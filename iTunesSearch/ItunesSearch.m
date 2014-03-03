@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 Gangverk. All rights reserved.
 //
 
-#import "ItunesSearch.h"
 #include <CommonCrypto/CommonDigest.h>
+#import "ItunesSearch.h"
 
 #define API_URL @"https://itunes.apple.com/"
 
@@ -393,13 +393,13 @@
     // Ensure only valid objects are used in the search
     NSMutableArray *searchParameters = [NSMutableArray array];
 
-	if(appName) {
-		[searchParameters addObject:appName];
-	}
+    if (appName) {
+        [searchParameters addObject:appName];
+    }
 
-	if(developer) {
-		[searchParameters addObject:developer];
-	}
+    if (developer) {
+        [searchParameters addObject:developer];
+    }
 
     // Build the search term
     NSString *searchTerm = [searchParameters componentsJoinedByString:@"+"];
@@ -426,6 +426,5 @@
         }
     }
 }
-
 
 @end
