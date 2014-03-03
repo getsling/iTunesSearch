@@ -387,4 +387,45 @@
     }
 }
 
+#pragma mark - App methods
+
+- (void)getAppWithName:(NSString *)appName developer:(NSString *)developer limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+    // Ensure only valid objects are used in the search
+    NSMutableArray *searchParameters = [NSMutableArray array];
+
+	if(appName) {
+		[searchParameters addObject:appName];
+	}
+
+	if(developer) {
+		[searchParameters addObject:developer];
+	}
+
+    // Build the search term
+    NSString *searchTerm = [searchParameters componentsJoinedByString:@"+"];
+
+    if (searchTerm && [searchTerm length] > 0) {
+        // Set up the request paramters
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        params[@"term"] = [self forceString:searchTerm];
+        params[@"media"] = @"software";
+
+        // Add the limit if supplied
+        if (limit && limit > 0) {
+            params[@"limit"] = limit;
+        }
+
+        [self performApiCallForMethod:@"search"
+                           withParams:params
+                           andFilters:nil
+                       successHandler:successHandler
+                       failureHandler:failureHandler];
+    } else {
+        if (successHandler) {
+            return successHandler(nil);
+        }
+    }
+}
+
+
 @end
