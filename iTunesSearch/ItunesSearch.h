@@ -48,5 +48,6 @@ typedef void (^ItunesSearchReturnBlockWithError)(NSError *error);
 #pragma mark - App methods
 
 - (void)getAppWithName:(NSString *)appName developer:(NSString*)developer limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
+- (void)getAppsByDeveloper:(NSString *)developerId limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
 
 @end

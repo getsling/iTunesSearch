@@ -427,4 +427,29 @@
     }
 }
 
+- (void)getAppsByDeveloper:(NSString *)developerId limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+    // Ensure only valid developerId is used in the search
+    if (developerId && [developerId length] > 0) {
+        // Set up the request paramters
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        params[@"id"] = developerId;
+        params[@"entity"] = @"software";
+
+        // Add the limit if supplied
+        if (limit && limit > 0) {
+            params[@"limit"] = limit;
+        }
+
+        [self performApiCallForMethod:@"lookup"
+                           withParams:params
+                           andFilters:nil
+                       successHandler:successHandler
+                       failureHandler:failureHandler];
+    } else {
+        if (successHandler) {
+            return successHandler(nil);
+        }
+    }
+}
+
 @end
