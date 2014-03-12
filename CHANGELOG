@@ -1,5 +1,8 @@
+0.1.6 - March 12, 2014
+- Added method for searching for apps via developer id.
+
 0.1.5 - March 3, 2014
-- Added method for searching for apps.
+- Added method for searching for apps via app name and developer name.
 
 0.1.4 - November 19, 2013
 - Added possibility to supply a country code.
