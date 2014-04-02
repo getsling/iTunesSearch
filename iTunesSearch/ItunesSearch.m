@@ -29,8 +29,7 @@
 - (id)init {
     self = [super init];
     if (self) {
-        self.partnerId = @"";
-        self.tradeDoublerId = @"";
+        self.affiliateToken = @"";
         self.queue = [[NSOperationQueue alloc] init];
         self.timeoutInterval = 10;
         self.maxCacheAge = (60 * 60 * 24);
@@ -42,7 +41,7 @@
 
 - (NSString *)md5sumFromString:(NSString *)string {
 	unsigned char digest[CC_MD5_DIGEST_LENGTH], i;
-	CC_MD5([string UTF8String], [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding], digest);
+	CC_MD5([string UTF8String], (CC_LONG)[string lengthOfBytesUsingEncoding:NSUTF8StringEncoding], digest);
 	NSMutableString *ms = [NSMutableString string];
 	for (i=0;i<CC_MD5_DIGEST_LENGTH;i++) {
 		[ms appendFormat: @"%02x", (int)(digest[i])];
@@ -93,11 +92,9 @@
 
     NSMutableDictionary *newParams = [params mutableCopy];
 
-    // Add affiliate identifiers if supplied
-    if (self.partnerId && self.partnerId.length > 0)
-        newParams[@"partnerId"] = self.partnerId;
-    if (self.tradeDoublerId && self.tradeDoublerId.length > 0)
-        newParams[@"tduid"] = self.tradeDoublerId;
+    // Add affiliate token if supplied
+    if (self.affiliateToken && self.affiliateToken.length > 0)
+        newParams[@"at"] = self.affiliateToken;
 
     // Set the user's country to get the correct price
     if (self.countryCode && self.countryCode.length) {

@@ -13,9 +13,8 @@ A library for communicating with the iTunes store.
 
 ## Usage
 ```objective-c
-// Set the Last.fm session info
-[ItunesSearch sharedInstance].partnerId = @"xxx";
-[ItunesSearch sharedInstance].tradeDoublerId = @"xxx";
+// Set the PHG Affiliate Token info
+[ItunesSearch sharedInstance].affiliateToken = @"xxx";
 
 // Get artist info
 [[ItunesSearch sharedInstance] getAlbumsForArtist:@"Pink Floyd" limitOrNil:@20 successHandler:^(NSArray *result) {
