@@ -20,8 +20,7 @@ typedef void (^ItunesSearchReturnBlockWithError)(NSError *error);
 
 @interface ItunesSearch : NSObject
 
-@property (strong, nonatomic) NSString *partnerId;
-@property (strong, nonatomic) NSString *tradeDoublerId;
+@property (strong, nonatomic) NSString *affiliateToken;
 @property (strong, nonatomic) NSString *countryCode;    // default: NSLocaleCountryCode
 @property (unsafe_unretained, nonatomic) id <ItunesSearchCache> cacheDelegate;
 @property (nonatomic) NSTimeInterval timeoutInterval;   // default: 10
