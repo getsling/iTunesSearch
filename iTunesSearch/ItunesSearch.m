@@ -449,4 +449,45 @@
     }
 }
 
+#pragma mark - Podcast methods
+
+- (void)getPodcastWithName:(NSString *)podcast artist:(NSString *)artist limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+
+    NSMutableArray *searchParameters = [NSMutableArray array];
+    if (podcast) {
+        [searchParameters addObject:podcast];
+    }
+    
+    if (artist) {
+        [searchParameters addObject:artist];
+    }
+    
+    // Build the search term
+    NSString *searchTerm = [searchParameters componentsJoinedByString:@"+"];
+    
+    if (searchTerm && [searchTerm length] > 0) {
+        // Set up the request paramters
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        params[@"term"] = [self forceString:searchTerm];
+        params[@"media"] = @"podcast";
+        params[@"entity"] = @"podcast";
+        
+        // Add the limit if supplied
+        if (limit && limit > 0) {
+            params[@"limit"] = limit;
+        }
+        
+        [self performApiCallForMethod:@"search"
+                           withParams:params
+                           andFilters:nil
+                       successHandler:successHandler
+                       failureHandler:failureHandler];
+    } else {
+        if (successHandler) {
+            return successHandler(nil);
+        }
+    }
+}
+
+
 @end

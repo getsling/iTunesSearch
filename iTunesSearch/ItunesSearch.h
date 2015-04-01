@@ -49,4 +49,8 @@ typedef void (^ItunesSearchReturnBlockWithError)(NSError *error);
 - (void)getAppWithName:(NSString *)appName developer:(NSString*)developer limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
 - (void)getAppsByDeveloper:(NSString *)developerId limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
 
+#pragma mark - Podcast methods
+
+- (void)getPodcastWithName:(NSString *)podcast artist:(NSString *)artist limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler;
+
 @end
