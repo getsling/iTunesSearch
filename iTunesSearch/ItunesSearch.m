@@ -456,6 +456,29 @@
     }
 }
 
+- (void)getAppsWithIds:(NSArray *)appIds successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
+    
+    // Build a string of App Ids
+    NSString *appIdsString = [appIds componentsJoinedByString:@","];
+    
+    if (appIdsString && [appIdsString length] > 0) {
+        // Set up the request paramters
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        params[@"id"] = [self forceString:appIdsString];
+        params[@"media"] = @"software";
+        
+        [self performApiCallForMethod:@"lookup"
+                           withParams:params
+                           andFilters:nil
+                       successHandler:successHandler
+                       failureHandler:failureHandler];
+    } else {
+        if (successHandler) {
+            return successHandler(nil);
+        }
+    }
+}
+
 #pragma mark - Podcast methods
 
 - (void)getPodcastWithName:(NSString *)podcast artist:(NSString *)artist limitOrNil:(NSNumber *)limit successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
