@@ -6,10 +6,15 @@
 A library for communicating with the iTunes store.
 
 ### Features
+- Get albums for artists
+- Get tracks for album
+- Get apps by developer
+- Search podcasts
+
+And:
 - Block based for easier usage
 - No dependencies
 - Result caching
-- Actively developed and maintained (it's used in the official Last.fm Scrobbler app!)
 
 ## Usage
 ```objective-c
