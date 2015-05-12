@@ -463,9 +463,9 @@
     if (appIdsString && [appIdsString length] > 0) {
         // Set up the request paramters
         NSDictionary * params = @{
-                                  @"id": [self forceString:appIdsString],
-                                  @"media": @"software"
-                                  };
+            @"id": [self forceString:appIdsString],
+            @"media": @"software"
+        };
         
         [self performApiCallForMethod:@"lookup"
                            withParams:params
