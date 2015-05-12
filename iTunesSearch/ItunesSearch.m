@@ -457,7 +457,6 @@
 }
 
 - (void)getAppsWithIds:(NSArray *)appIds successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
-    
     // Build a string of App Ids
     NSString *appIdsString = [appIds componentsJoinedByString:@","];
     
