@@ -30,6 +30,7 @@
     self = [super init];
     if (self) {
         self.affiliateToken = @"";
+        self.campaignToken = @"";
         self.queue = [[NSOperationQueue alloc] init];
         self.timeoutInterval = 10;
         self.maxCacheAge = (60 * 60 * 24);
@@ -93,9 +94,15 @@
     NSMutableDictionary *newParams = [params mutableCopy];
 
     // Add affiliate token if supplied
-    if (self.affiliateToken && self.affiliateToken.length > 0)
+    if (self.affiliateToken && self.affiliateToken.length > 0) {
         newParams[@"at"] = self.affiliateToken;
+    }
 
+    // Add campaign token if supplied
+    if (self.campaignToken && self.campaignToken.length > 0) {
+        newParams[@"ct"] = self.campaignToken;
+    }
+    
     // Set the user's country to get the correct price
     if (self.countryCode && self.countryCode.length) {
         newParams[@"country"] = self.countryCode;
