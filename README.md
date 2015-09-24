@@ -29,8 +29,6 @@ And:
 }];
 ```
 
-See the included iOS project for examples.
-
 
 ## Installation
 You can install iTunesSearch with [CocoaPods](http://cocoapods.org). You can also get the code and drag the iTunesSearch subfolder into your Xcode project.
