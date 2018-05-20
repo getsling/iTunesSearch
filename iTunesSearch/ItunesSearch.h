@@ -2,7 +2,7 @@
 //  ItunesSearch.h
 //  iTunesSearch
 //
-//  Created by Piers Biddlestone on 28/09/12.
+//  Created by eightytwo Biddlestone on 28/09/12.
 //  Copyright (c) 2012 Gangverk. All rights reserved.
 //
 

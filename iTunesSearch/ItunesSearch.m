@@ -2,7 +2,7 @@
 //  ItunesSearch.m
 //  iTunesSearch
 //
-//  Created by Piers Biddlestone on 28/09/12.
+//  Created by eightytwo on 28/09/12.
 //  Copyright (c) 2012 Gangverk. All rights reserved.
 //
 
@@ -102,7 +102,7 @@
     if (self.campaignToken && self.campaignToken.length > 0) {
         newParams[@"ct"] = self.campaignToken;
     }
-    
+
     // Set the user's country to get the correct price
     if (self.countryCode && self.countryCode.length) {
         newParams[@"country"] = self.countryCode;
@@ -459,14 +459,14 @@
 - (void)getAppsWithIds:(NSArray *)appIds successHandler:(ItunesSearchReturnBlockWithArray)successHandler failureHandler:(ItunesSearchReturnBlockWithError)failureHandler {
     // Build a string of App Ids
     NSString *appIdsString = [appIds componentsJoinedByString:@","];
-    
+
     if (appIdsString && [appIdsString length] > 0) {
         // Set up the request paramters
         NSDictionary * params = @{
             @"id": [self forceString:appIdsString],
             @"media": @"software"
         };
-        
+
         [self performApiCallForMethod:@"lookup"
                            withParams:params
                            andFilters:nil
@@ -487,26 +487,26 @@
     if (podcast) {
         [searchParameters addObject:podcast];
     }
-    
+
     if (artist) {
         [searchParameters addObject:artist];
     }
-    
+
     // Build the search term
     NSString *searchTerm = [searchParameters componentsJoinedByString:@"+"];
-    
+
     if (searchTerm && [searchTerm length] > 0) {
         // Set up the request paramters
         NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
         params[@"term"] = [self forceString:searchTerm];
         params[@"media"] = @"podcast";
         params[@"entity"] = @"podcast";
-        
+
         // Add the limit if supplied
         if (limit && limit > 0) {
             params[@"limit"] = limit;
         }
-        
+
         [self performApiCallForMethod:@"search"
                            withParams:params
                            andFilters:nil
